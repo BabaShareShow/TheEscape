@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Escape — Build Changelog</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cinzel:wght@700;900&display=swap');
+
+  :root {
+    --bg: #0f0f14;
+    --surface: #18181f;
+    --surface2: #202030;
+    --border: #2a2a40;
+    --gold: #c9a84c;
+    --gold2: #f0d080;
+    --text: #e8e0d0;
+    --text2: #9090a0;
+    --green: #4caf7d;
+    --blue: #4a9eff;
+    --purple: #a878f0;
+    --red: #e05050;
+    --orange: #e0843c;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    padding: 40px 24px 80px;
+  }
+
+  .page {
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  /* Header */
+  .doc-header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 24px;
+    margin-bottom: 36px;
+  }
+
+  .doc-eyebrow {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  .doc-title {
+    font-family: 'Cinzel', serif;
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--gold2);
+    letter-spacing: 0.08em;
+    line-height: 1.1;
+    margin-bottom: 6px;
+  }
+
+  .doc-subtitle {
+    color: var(--text2);
+    font-size: 0.9rem;
+  }
+
+  .build-compare {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  .build-tag {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid;
+  }
+
+  .build-tag.old { border-color: rgba(144,144,160,0.4); color: var(--text2); }
+  .build-tag.new { border-color: rgba(76,175,125,0.5); color: var(--green); background: rgba(76,175,125,0.08); }
+  .build-tag .arrow { margin: 0 8px; opacity: 0.4; }
+
+  /* Sections */
+  .section {
+    margin-bottom: 40px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-icon {
+    font-size: 1.2rem;
+    width: 32px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  .section-count {
+    margin-left: auto;
+    font-size: 0.72rem;
+    color: var(--text2);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 2px 8px;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.08em;
+    flex-shrink: 0;
+  }
+
+  /* Change entries */
+  .change {
+    display: flex;
+    gap: 14px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+
+  .change:last-child { margin-bottom: 0; }
+
+  .change-badge {
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 3px 7px;
+    border-radius: 4px;
+    border: 1px solid;
+    white-space: nowrap;
+    align-self: flex-start;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+
+  .badge-new     { background: rgba(76,175,125,0.12);  border-color: rgba(76,175,125,0.4);  color: var(--green);  }
+  .badge-changed { background: rgba(74,158,255,0.10);  border-color: rgba(74,158,255,0.4);  color: var(--blue);   }
+  .badge-fixed   { background: rgba(168,120,240,0.10); border-color: rgba(168,120,240,0.4); color: var(--purple); }
+  .badge-removed { background: rgba(224,80,80,0.10);   border-color: rgba(224,80,80,0.4);   color: var(--red);    }
+  .badge-tuned   { background: rgba(224,132,60,0.10);  border-color: rgba(224,132,60,0.4);  color: var(--orange); }
+
+  .change-body { flex: 1; min-width: 0; }
+
+  .change-title {
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 3px;
+    font-size: 0.92rem;
+  }
+
+  .change-detail {
+    color: var(--text2);
+    font-size: 0.82rem;
+    line-height: 1.5;
+  }
+
+  .change-detail strong { color: var(--text); font-weight: 500; }
+
+  .diff-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+  }
+
+  .diff-old {
+    font-size: 0.78rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(224,80,80,0.1);
+    border: 1px solid rgba(224,80,80,0.3);
+    color: #e08080;
+    font-family: monospace;
+  }
+
+  .diff-new {
+    font-size: 0.78rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(76,175,125,0.1);
+    border: 1px solid rgba(76,175,125,0.3);
+    color: #70d090;
+    font-family: monospace;
+  }
+
+  .diff-arrow {
+    color: var(--text2);
+    align-self: center;
+    font-size: 0.8rem;
+  }
+
+  /* Summary bar */
+  .summary-bar {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 36px;
+  }
+
+  .summary-stat { text-align: center; }
+  .summary-stat-value {
+    font-family: 'Cinzel', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .summary-stat-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text2);
+    margin-top: 3px;
+  }
+
+  .summary-divider {
+    width: 1px;
+    background: var(--border);
+    align-self: stretch;
+  }
+
+  /* Footer */
+  .doc-footer {
+    margin-top: 48px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    color: var(--text2);
+    font-size: 0.78rem;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="doc-header">
+    <div class="doc-eyebrow">Iron Fox Games · Internal Build Report</div>
+    <div class="doc-title">The Escape — Build Changelog</div>
+    <div class="doc-subtitle">A summary of changes, additions, and tuning between builds</div>
+    <div class="build-compare">
+      <div class="build-tag old">Build 260224.1</div>
+      <div class="build-tag new">→&nbsp;&nbsp;Build 260310.1</div>
+    </div>
+  </div>
+
+  <div class="summary-bar">
+    <div class="summary-stat">
+      <div class="summary-stat-value" style="color:#4caf7d;">7</div>
+      <div class="summary-stat-label">New Features</div>
+    </div>
+    <div class="summary-divider"></div>
+    <div class="summary-stat">
+      <div class="summary-stat-value" style="color:#4a9eff;">6</div>
+      <div class="summary-stat-label">Changes</div>
+    </div>
+    <div class="summary-divider"></div>
+    <div class="summary-stat">
+      <div class="summary-stat-value" style="color:#e0843c;">1</div>
+      <div class="summary-stat-label">Tuning Pass</div>
+    </div>
+    <div class="summary-divider"></div>
+    <div class="summary-stat">
+      <div class="summary-stat-value">14</div>
+      <div class="summary-stat-label">Total Changes</div>
+    </div>
+  </div>
+
+
+  <!-- PERSONAL NOTE -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">✉</div>
+      <div class="section-title">Personal Note from Shawn</div>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin-bottom:8px;line-height:1.8;color:var(--text2);">
+      <p style="color:var(--text);font-weight:600;margin-bottom:16px;">Ryan and Derek,<br>Hello! Here's my personal changelog, followed by the game's changelog:</p>
+
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:14px;padding:0;">
+
+        <li style="display:flex;gap:12px;"><span style="color:var(--gold);flex-shrink:0;margin-top:2px;">✦</span><span>After our lunch, the world really started falling apart. I took a week off on a bender, so we'll mark that as PTO. My benders = not drugs or alcohol, but games. This time was a Stellaris renaissance, "celebrating" what I still genuinely believe might happen — the end of the world. Sorry for the buzzkill, and not using this tragedy as an excuse. These are dark, unprecedented times we live in. Not stoked about being on the bad guy team, either.</span></li>
+
+        <li style="display:flex;gap:12px;"><span style="color:var(--gold);flex-shrink:0;margin-top:2px;">✦</span><span>I did start absorbing the old game idea pitches during the bender, and started outlining what I want to do with each. The reformatting of the documents was an order of magnitude more difficult than this session's vibe coding. Some form of start will be made on all of those, using The Escape as a training tool. I want to keep at it with The Escape for now.</span></li>
+
+        <li style="display:flex;gap:12px;"><span style="color:var(--gold);flex-shrink:0;margin-top:2px;">✦</span><span>I "took a shit" on Monday, as my Dad would used to say in respect to his old saying, <em>"Take a shit or get off the pot!"</em> — and started active dev work on The Escape, Armageddon be damned.</span></li>
+
+        <li style="display:flex;gap:12px;"><span style="color:var(--gold);flex-shrink:0;margin-top:2px;">✦</span><span>The new build represents <strong style="color:var(--text);">40% "design coding"</strong> (I forgot that's what I wanted to call it!) and <strong style="color:var(--text);">60% figuring out why Claude is being throttled</strong> on developmental prompts.</span></li>
+
+        <li style="display:flex;gap:12px;"><span style="color:var(--gold);flex-shrink:0;margin-top:2px;">✦</span><span>I increased my subscription to <strong style="color:var(--text);">"Max"</strong>, which is 5× the bandwidth — $100/month — and I eventually was running into the same choking issue. (I will most likely go back to $20/month once this changelog settles.)</span></li>
+
+        <li style="display:flex;gap:12px;"><span style="color:var(--gold);flex-shrink:0;margin-top:2px;">✦</span><span>Turns out the drama is because of the <strong style="color:var(--text);">size of the code, which is now ~7,000 lines.</strong> I am led to believe that's a lot. Claude can only handle ~5,000 lines before it starts to choke. Very good to know, especially when we consider rapid game idea prototyping for the future.</span></li>
+
+        <li style="display:flex;gap:12px;"><span style="color:var(--gold);flex-shrink:0;margin-top:2px;">✦</span><span>I successfully installed Python and ran a Python script on the code. Running the script worked, but the code Claude made broke the visuals of the game.</span></li>
+
+        <li style="display:flex;gap:12px;"><span style="color:var(--gold);flex-shrink:0;margin-top:2px;">✦</span><span>I opened my own GitHub account and am now about to start editing the code directly in Notepad++. Claude will theoretically tell me exactly how and where to replace the code.</span></li>
+
+        <li style="display:flex;gap:12px;"><span style="color:var(--gold);flex-shrink:0;margin-top:2px;">✦</span><span>Claude generated this changelog by comparing the code of the old build and the new one — everything without any solicitation beyond me asking it to compare the code. <em>How fucking crazy is that</em> — this is probably one of the best changelogs I've ever read.</span></li>
+
+        <li style="display:flex;gap:12px;"><span style="color:var(--gold);flex-shrink:0;margin-top:2px;">✦</span><span>The new build is playable but needs testing. We were refining features and laying in two new Vegas hands. Only Ryan's made it in (and it's going to be name-changed to Ryan's Residenzia, Ryan's Retreat, or just Ryan's House) — sorry Derek, but blame Claude! We'll get yours in once I figure out this next self-progression point. There's also a new song for when you're playing in Vegas mode, but I couldn't get it in either before Claude ground to a halt.</span></li>
+
+        <li style="display:flex;gap:12px;"><span style="color:var(--gold);flex-shrink:0;margin-top:2px;">✦</span><span>I spent a good deal more time directly tweaking the UI this time than I did with the previous build.</span></li>
+
+        <li style="display:flex;gap:12px;"><span style="color:var(--gold);flex-shrink:0;margin-top:2px;">✦</span>
+          <span>FWIW, here's the code breakdown according to Claude (unsure if 100% accurate, but gives you an idea of where we're at):
+            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-top:10px;font-size:0.82rem;line-height:1.9;">
+              <div style="color:var(--text);font-weight:600;letter-spacing:0.06em;margin-bottom:8px;font-family:'Cinzel',serif;font-size:0.75rem;">SECTION MAP — The Escape Build 260310.1</div>
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                <div><span style="color:var(--gold);font-family:'Cinzel',serif;font-size:0.72rem;">§1 — CSS</span> <span style="color:var(--text2);">(~lines 1–900) · CSS variables/theming · Layout · Card styles · Deck themes · Vegas overrides · UI components · Animations</span></div>
+                <div><span style="color:var(--gold);font-family:'Cinzel',serif;font-size:0.72rem;">§2 — HTML Structure</span> <span style="color:var(--text2);">(~lines 900–1600) · Header · Status bar · Buff tray · Board/Discard · Grip · Tools · Log · Overlays · Modals</span></div>
+                <div><span style="color:var(--gold);font-family:'Cinzel',serif;font-size:0.72rem;">§3 — JS: Card Engine</span> <span style="color:var(--text2);">· deck, shuffle, constants</span></div>
+                <div><span style="color:var(--gold);font-family:'Cinzel',serif;font-size:0.72rem;">§4 — JS: Hand Evaluation</span> <span style="color:var(--text2);">· evaluateHand, getBestHand, rankCounts, joker resolution</span></div>
+                <div><span style="color:var(--gold);font-family:'Cinzel',serif;font-size:0.72rem;">§5 — JS: Specialty / Vegas Hands</span> <span style="color:var(--text2);">· Broadway, Wheel, Steel Wheel, PaiGow, Dead Man, Orient Express, etc.</span></div>
+                <div><span style="color:var(--gold);font-family:'Cinzel',serif;font-size:0.72rem;">§6 — JS: Game State & Init</span> <span style="color:var(--text2);">· state object, newGame, difficulty/mode setup</span></div>
+                <div><span style="color:var(--gold);font-family:'Cinzel',serif;font-size:0.72rem;">§7 — JS: Turn Flow</span> <span style="color:var(--text2);">· action handlers, anchor selection, card play, scoring, draw, advance turn</span></div>
+                <div><span style="color:var(--gold);font-family:'Cinzel',serif;font-size:0.72rem;">§8 — JS: Tools</span> <span style="color:var(--text2);">· Explosives, Flare, Radio logic</span></div>
+                <div><span style="color:var(--gold);font-family:'Cinzel',serif;font-size:0.72rem;">§9 — JS: Render Functions</span> <span style="color:var(--text2);">· renderBoard, renderGrip, renderDiscard, renderTurnPips, etc.</span></div>
+                <div><span style="color:var(--gold);font-family:'Cinzel',serif;font-size:0.72rem;">§10 — JS: UI / Event Handlers</span> <span style="color:var(--text2);">· sort, panel toggles, deck type, variant/difficulty pickers</span></div>
+                <div><span style="color:var(--gold);font-family:'Cinzel',serif;font-size:0.72rem;">§11 — JS: Drag & Drop</span> <span style="color:var(--text2);">· grip drag system, board drop targets</span></div>
+                <div><span style="color:var(--gold);font-family:'Cinzel',serif;font-size:0.72rem;">§12 — JS: Player Profile & Persistence</span> <span style="color:var(--text2);">· localStorage, handle/code, stats tracking</span></div>
+                <div><span style="color:var(--gold);font-family:'Cinzel',serif;font-size:0.72rem;">§13 — JS: Achievements</span></div>
+                <div><span style="color:var(--gold);font-family:'Cinzel',serif;font-size:0.72rem;">§14 — JS: Audio</span></div>
+                <div><span style="color:var(--gold);font-family:'Cinzel',serif;font-size:0.72rem;">§15 — JS: Vegas Scoring Mode</span> <span style="color:var(--text2);">· vegas activation, choice banner, special hand effects</span></div>
+                <div><span style="color:var(--gold);font-family:'Cinzel',serif;font-size:0.72rem;">§16 — JS: Celebration & Game Over</span></div>
+              </div>
+            </div>
+          </span>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+
+  <!-- SCORING -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">🎯</div>
+      <div class="section-title">Scoring System</div>
+      <div class="section-count">2 changes</div>
+    </div>
+
+    <div class="change">
+      <div class="change-badge badge-tuned">Tuned</div>
+      <div class="change-body">
+        <div class="change-title">Full paytable rebalance — all hand values multiplied ×10</div>
+        <div class="change-detail">All base hand scores have been scaled up by 10×. This creates more scoring headroom for multipliers, bonuses, and future Vegas hand effects without hitting the score ceiling too quickly.</div>
+        <div class="diff-row">
+          <span class="diff-old">Natural Royal: 1,000</span><span class="diff-arrow">→</span><span class="diff-new">10,000</span>
+        </div>
+        <div class="diff-row">
+          <span class="diff-old">Straight Flush: 40</span><span class="diff-arrow">→</span><span class="diff-new">400</span>
+        </div>
+        <div class="diff-row">
+          <span class="diff-old">One Pair: 1</span><span class="diff-arrow">→</span><span class="diff-new">10</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="change">
+      <div class="change-badge badge-new">New</div>
+      <div class="change-body">
+        <div class="change-title">Vegas Scoring Mode</div>
+        <div class="change-detail">An optional alternate scoring layer that adds <strong>11 specialty hands</strong> on top of standard poker scoring. Vegas hands reward specific card combinations with bonus points or game-altering effects. Includes a full visual re-theme of the UI when active — dark casino aesthetic with neon accents, animated title, and casino felt board.</div>
+        <div class="change-detail" style="margin-top:6px;">Specialty hands include: <strong>Steel Wheel</strong> (500 pts), <strong>Baba's Quads</strong> (444 pts), <strong>Orient Express</strong> (×8 final score multiplier), <strong>Poker Brat</strong> (17 pts + ×2 future multiplier), <strong>Texas Dolly</strong> (102 pts), <strong>Broadway / Wheel</strong> (88 pts each), <strong>Ryan's Riches</strong> (94 pts), <strong>Dead Man's Hand</strong> (instant escape, score reset to 0), <strong>PaiGow!</strong> and <strong>Low Ball</strong> (44 pts each).</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- UI & LAYOUT -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">🖥</div>
+      <div class="section-title">UI & Layout</div>
+      <div class="section-count">5 changes</div>
+    </div>
+
+    <div class="change">
+      <div class="change-badge badge-changed">Changed</div>
+      <div class="change-body">
+        <div class="change-title">Header completely redesigned</div>
+        <div class="change-detail">The old single-row header (title + controls side by side) has been replaced with a <strong>two-bar layout</strong>. The title now sits in its own full-width bar above a dedicated controls bar, which is divided into "In-Game" options (New, Sound, Deck, Rules) and "Out-of-Game" setup (Mode, Difficulty, Scoring). Clearer hierarchy, less visual crowding.</div>
+      </div>
+    </div>
+
+    <div class="change">
+      <div class="change-badge badge-new">New</div>
+      <div class="change-body">
+        <div class="change-title">Active Buffs Tray</div>
+        <div class="change-detail">A persistent tray below the header displays any active game buffs as animated chips. Currently used by Vegas hands that apply ongoing effects (e.g. Poker Brat's ×2 score multiplier, Orient Express multiplier). Displays "No active buffs" when empty.</div>
+      </div>
+    </div>
+
+    <div class="change">
+      <div class="change-badge badge-new">New</div>
+      <div class="change-body">
+        <div class="change-title">Interaction State Chip</div>
+        <div class="change-detail">A small status indicator sits next to the message box showing the current game interaction state: <strong>Open</strong> (player can act), <strong>Waiting</strong> (awaiting input), or <strong>Locked</strong> (no action available). Helps players understand what the game expects at a glance.</div>
+      </div>
+    </div>
+
+    <div class="change">
+      <div class="change-badge badge-new">New</div>
+      <div class="change-body">
+        <div class="change-title">Collapsible Scoring Reference Tables</div>
+        <div class="change-detail">The Options panel now contains expandable scoring tables for both Regular hands and Vegas hands, so players can reference point values without leaving the game. Vegas table is only shown when Vegas Scoring is active.</div>
+      </div>
+    </div>
+
+    <div class="change">
+      <div class="change-badge badge-changed">Changed</div>
+      <div class="change-body">
+        <div class="change-title">Hand Result area updated</div>
+        <div class="change-detail">The hand result display now supports a <strong>Recall</strong> button and proper flex layout for the hand name, score badge, and action. Specialty hands get a distinct blue glow styling to visually differentiate them from standard hands.</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- GAME MODES -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">🎲</div>
+      <div class="section-title">Game Modes</div>
+      <div class="section-count">2 changes</div>
+    </div>
+
+    <div class="change">
+      <div class="change-badge badge-new">New</div>
+      <div class="change-body">
+        <div class="change-title">Vegas Choice Banner</div>
+        <div class="change-detail">When a hand qualifies for both a standard score and a Vegas specialty score, a contextual banner appears on the board asking the player to choose which scoring to apply. Supports strategic decision-making — e.g. a hand that scores as both a Full House (80 pts) and Texas Dolly (102 pts) can be player-directed.</div>
+      </div>
+    </div>
+
+    <div class="change">
+      <div class="change-badge badge-changed">Changed</div>
+      <div class="change-body">
+        <div class="change-title">Scoring Toggle moved to Options: Out-of-Game</div>
+        <div class="change-detail">Vegas Scoring (previously called Specialty Hands) is now grouped with Mode and Difficulty as a setup option, not an in-game toggle. It is locked once a game is in progress, consistent with Mode and Difficulty behavior.</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- DECK THEMES -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">🂠</div>
+      <div class="section-title">Deck Themes & Visual Polish</div>
+      <div class="section-count">3 changes</div>
+    </div>
+
+    <div class="change">
+      <div class="change-badge badge-new">New</div>
+      <div class="change-body">
+        <div class="change-title">Standard Mode border styling</div>
+        <div class="change-detail">When Standard deck is active (and Vegas Mode is off), all UI panels now display with a subtle teal/dark-blue border treatment, giving the default theme a more distinct visual identity rather than the generic dark-grey borders from the previous build.</div>
+      </div>
+    </div>
+
+    <div class="change">
+      <div class="change-badge badge-new">New</div>
+      <div class="change-body">
+        <div class="change-title">Additional fonts added</div>
+        <div class="change-detail"><strong>Playfair Display</strong> and <strong>Exo 2</strong> added to the font stack. Playfair Display is used for the animated Vegas title treatment; Exo 2 is used for body text in Vegas mode to reinforce the cyberpunk/neon aesthetic.</div>
+      </div>
+    </div>
+
+    <div class="change">
+      <div class="change-badge badge-changed">Changed</div>
+      <div class="change-body">
+        <div class="change-title">Section label styling updated</div>
+        <div class="change-detail">Section labels (Board, Grip, Discard, etc.) now include a subtle <strong>italic</strong> style. Minor polish pass.</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- PLAYER PROFILE -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">⊛</div>
+      <div class="section-title">Player Profile & Persistence</div>
+      <div class="section-count">2 changes</div>
+    </div>
+
+    <div class="change">
+      <div class="change-badge badge-changed">Changed</div>
+      <div class="change-body">
+        <div class="change-title">Rules panel updated with new game content</div>
+        <div class="change-detail">The Rules panel now documents the Vegas Scoring mode and its 11 specialty hands, including a formatted reference table. High Variance goal table and all four game modes remain documented.</div>
+      </div>
+    </div>
+
+    <div class="change">
+      <div class="change-badge badge-changed">Changed</div>
+      <div class="change-body">
+        <div class="change-title">Sort buttons updated</div>
+        <div class="change-detail">Grip sort buttons now read <strong>"↕ Rank"</strong> and <strong>"↕ Suit"</strong> (previously "Sort by Rank" / "Sort by Suit"). More compact, consistent with the tighter header layout.</div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="doc-footer">
+    <span>The Escape · Iron Fox Games · Charlottetown, PEI</span>
+    <span>Build 260224.1 → 260310.1 · Generated March 10, 2026</span>
+  </div>
+
+</div>
+</body>
+</html>
